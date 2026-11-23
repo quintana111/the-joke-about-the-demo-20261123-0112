@@ -1,25 +1,29 @@
-// Entry: a one-line joke about working beside an AI coding agent.
-// The agent "fixes" the demo bug the only way it knows how.
+// One-line joke entry for make.fun — the-joke-about-the-demo-20261123-0112.
+// Writes the joke to /output/entry.txt, then reads it back to prove it stuck.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const JOKE = "My agent fixed the bug live on demo day — by deleting the feature.";
-const OUT = "/output/entry.txt";
 
-if (JOKE.split("\n").length !== 1) {
-  throw new Error("joke must be exactly one line");
-}
-if ([...JOKE].length < 1 || [...JOKE].length > 280) {
-  throw new Error("joke must be 1-280 code points");
-}
-if (JOKE.trim().length === 0) {
-  throw new Error("joke must not be empty");
+// Absolute output path, so any cwd works.
+const outDir = "/output";
+const outFile = "/output/entry.txt";
+
+function codePoints(s) {
+  return [...s].length;
 }
 
-mkdirSync("/output", { recursive: true });
-writeFileSync(OUT, JOKE, "utf8");
-
-// Read back and verify: what the grader reads must be exactly the joke.
-const written = readFileSync(OUT, "utf8");
-if (written !== JOKE) {
-  throw new Error("entry.txt does not match the joke");
+function checkJoke(text) {
+  if (text.length === 0) throw new Error("joke must not be empty");
+  const lines = text.split("\n");
+  if (lines.length !== 1) throw new Error(`joke must be exactly one line, got ${lines.length}`);
+  const n = codePoints(text);
+  if (n < 1 || n > 280) throw new Error(`joke must be 1-280 code points, got ${n}`);
 }
+
+checkJoke(JOKE);
+mkdirSync(outDir, { recursive: true });
+writeFileSync(outFile, JOKE + "\n", "utf8");
+
+const back = readFileSync(outFile, "utf8");
+if (back !== JOKE + "\n") throw new Error("read-back mismatch: entry.txt does not match the joke");
+console.log("wrote /output/entry.txt");
